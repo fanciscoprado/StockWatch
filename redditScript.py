@@ -7,8 +7,8 @@ import operator
 import os,glob
 
 start_time = time.time()
-dataPath ="/home/frank/Data/data/"
-rootPath = "/home/frank/Data"
+dataPath ="/"
+rootPath = ""
 postLimit = 1000 #<----------------- how many reddit post are parsed per subreddit
 
 def saveStats(output, iList):
@@ -34,7 +34,8 @@ def search(tittleList, iList):
 
 def parse(subreddit, srName):
   tempList = [0] * len(tickerList)
-  for submission in subreddit.new(limit=postLimit):#<----------------------------
+  for submission in subreddit.new(limit=postLimit):
+#<----------------------------
       wordList = submission.title.split()
       search(wordList, tempList)
   saveStats(srName, tempList)
