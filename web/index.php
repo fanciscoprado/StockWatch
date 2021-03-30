@@ -2,8 +2,8 @@
 <script> var noGood = false;</script>
 <?php
 
-$data_dir = '/home/frank/Data/data/';
-$root_dir = '/home/frank/Data/';
+$data_dir = '/';
+$root_dir = '/';
 /*
 $message = "";
 if(isset($_POST['SubmitButton'])){ //check if form was submitted
