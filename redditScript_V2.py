@@ -7,8 +7,8 @@ import operator
 import os,glob
 
 start_time = time.time()
-dataPath ="/home/frank/Data/data/"
-rootPath = "/home/frank/Data"
+dataPath =""
+rootPath = ""
 postLimit = 1000 #<----------------- how many reddit post are parsed per subreddit
 
 def saveStats(output, iList):
