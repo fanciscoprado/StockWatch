@@ -20,7 +20,7 @@
     <th></th>
   </tr>
   <?php
-  $data_path = '/home/frank/Data/data/';
+  $data_path = '';
   $fileName = $_GET['varname'];
   $file = file($data_path.$fileName);
   foreach($file as $file_data)
