@@ -1,16 +1,20 @@
-
-
 #! usr/bin/env python3
+import time
 import praw
 import datetime as dt
 import csv
 import operator
 import os,glob
 
+start_time = time.time()
+dataPath ="/home/frank/Data/data/"
+rootPath = "/home/frank/Data"
+postLimit = 1000 #<----------------- how many reddit post are parsed per subreddit
+
 def saveStats(output, iList):
-  writeF = open("/home/Data/data/" + output + ".csv", "w")
+  writeF = open(dataPath + output + ".csv", "w")
   stockIndex = 0
-  for ticker in stockList:
+  for ticker in tickerList:
     writeF.write(ticker + ", " + str(iList[stockIndex]) + "\n")
     stockIndex += 1
   writeF.close()
@@ -20,7 +24,7 @@ def search(tittleList, iList):
     tickerIndex = 0
     if word[0] == "$":
       word = word.replace("$", '').replace(":",'').replace("(", '').replace( ")",'').replace("#", '')
-    for ticker in stockList:
+    for ticker in tickerList:
       if ticker == word:
         tCount[tickerIndex] += 1
         iList[tickerIndex] += 1
@@ -29,8 +33,8 @@ def search(tittleList, iList):
       tickerIndex += 1
 
 def parse(subreddit, srName):
-  tempList = [0] * len(stockList)
-  for submission in subreddit.new(limit=1000):#<----------------------------
+  tempList = [0] * len(tickerList)
+  for submission in subreddit.new(limit=postLimit):#<----------------------------
       wordList = submission.title.split()
       search(wordList, tempList)
   saveStats(srName, tempList)
@@ -47,16 +51,36 @@ def sortCsv(filePath):
     f.write(str(line[0]) + "," + str(line[1]) + "\n")
   f.close()
 
-reddit = praw.Reddit(client_id='client id', \
-                     client_secret='client secret', \
-                     user_agent='user agent', \
-                     username='username', \
-                     password='password')
+def openTickerList():
+    try:
+        f = open(rootPath + "/formated.txt", "r")
+        return f.read().split()
+    except:
+        print("Failed to load ticker list. Aborting")
+        quit()
 
-f = open("/home/Data/formated.txt", "r")
-stockList = f.read().split()
+def saveTotalCount(tCount, tickerList):
+    try:
+        writeF = open(dataPath + "/output.csv", "w")
+        stockIndex = 0
+        for ticker in tickerList:
+          writeF.write(ticker + ", " + str(tCount[stockIndex]) + "\n")
+          stockIndex += 1
+        writeF.close()
+    except:
+        print("Failed to save top 5")
+        quit()
 
-tCount = [0] * len(stockList)
+
+reddit = praw.Reddit(client_id='Q5PYWemlLJrxFA', \
+                     client_secret='60qhmjJAAx-xbGA_-b5YJEXfOGr0wA', \
+                     user_agent='Lurker', \
+                     username='No-Ad7746', \
+                     password='@pple559')
+
+
+tickerList = openTickerList()
+tCount = [0] * len(tickerList)
 subReddits = open("subs.txt", "r")
 subRedditList = subReddits.read().split()
 
@@ -66,18 +90,14 @@ for sub in subRedditList:
         parse(reddit.subreddit(sub), sub)
     except:
         print("failed: " + sub)
-print('done 1')
+print('done')
 subReddits.close()
 
 
+saveTotalCount(tCount, tickerList)
 
-writeF = open("/home/Data/data/output.csv", "w")
-stockIndex = 0
-for ticker in stockList:
-  writeF.write(ticker + ", " + str(tCount[stockIndex]) + "\n")
-  stockIndex += 1
-writeF.close()
 
-folder_path = 'data'
-for filename in glob.glob(os.path.join(folder_path, '*.csv')):
+for filename in glob.glob(os.path.join(dataPath, '*.csv')):
   sortCsv(filename)
+
+print("--- runtime: " + str(int(((time.time() - start_time)/60)))  +"m:"+ str(int(( (time.time() - start_time) %60)*1 )) + "s")
